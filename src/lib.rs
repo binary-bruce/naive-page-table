@@ -74,7 +74,7 @@ pub fn translated_str(token: usize, ptr: *const u8) -> String {
     string
 }
 
-pub fn translate_refmut<T>(token: usize, ptr: *mut T) -> &'static mut T {
+pub fn translated_refmut<T>(token: usize, ptr: *mut T) -> &'static mut T {
     let page_table = PageTable::from_token(token);
     let va = ptr as usize;
 
