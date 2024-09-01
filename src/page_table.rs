@@ -3,7 +3,7 @@ use alloc::vec::Vec;
 
 use crate::addr::{PhysPageNum, StepByOne, VirtAddr, VirtPageNum};
 use crate::frame::{frame_alloc, FrameTracker};
-use crate::{PTEFlags, PageTableEntry};
+use crate::{PTEFlags, PageTableEntry, PhysAddr};
 
 /// page table structure
 pub struct PageTable {
@@ -83,6 +83,16 @@ impl PageTable {
 
     pub fn translate(&self, vpn: VirtPageNum) -> Option<PageTableEntry> {
         self.find_pte(vpn).map(|pte| *pte)
+    }
+
+    pub fn translate_va(&self, va: VirtAddr) -> Option<PhysAddr> {
+        self.find_pte(va.clone().floor()).map(|pte| {
+            let aligned_pa: PhysAddr = pte.ppn().into();
+            let offset = va.page_offset();
+            let aligned_pa_usize: usize = aligned_pa.into();
+
+            (aligned_pa_usize + offset).into()
+        })
     }
 
     pub fn token(&self) -> usize {
